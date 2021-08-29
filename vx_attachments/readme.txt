@@ -6,4 +6,4 @@ git clone https://github.com.cnpmjs.org/Tomosom/operating_system.git
 2021-08-13问题解决
 remote: Support for password authentication was removed on August 13, 2021. Please use a personal access token instead.
 https://blog.csdn.net/weixin_41010198/article/details/119698015
-git remote set-url origin https://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@github.com.cnpmjs.org/Tomosom/operating_system.git
+git remote set-url origin https://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@github.com.cnpmjs.org/Tomosom/operating_system.git
