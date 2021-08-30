@@ -9,9 +9,9 @@ start:              ;定义标签, 也是后面跟着的一条指令的地址
     mov ss, ax
     mov ds, ax
     mov es, ax
-    
+
     mov si, msg     ; 将msg标签所对应的地址放到si寄存器中
-    
+
 print:
     mov al, [si]    ; 取数据, []类似c中的*
     add si, 1
@@ -21,11 +21,11 @@ print:
     mov bx, 0x0f
     int 0x10
     jmp print   ; 循环
-    
+
 last:
     hlt
     jmp last
-    
+
 msg:
     db 0x0a, 0x0a                   ;db : define byte, 定义了两个数据, 0x0a就是换行
     db "Hello, DTOS!"               ;在内存里边就是一系列连续的ASCII码
