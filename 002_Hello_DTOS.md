@@ -1,30 +1,30 @@
-# 1. Hello, DT〇S!
-## 1.1. 问题
+# 1. 问题
 - 主引导程序是软件还是固件？
-    > [软件]
+    > 答：软件
 - 如果是软件, 那么由谁开发？如何开发？
-    > [开发操作系统的程序员] [主引导程序是操作系统的一部分]
+    > 答：开发操作系统的程序员，主引导程序是操作系统的一部分
 
-## 1.2. 主引导程序
+## 1.1. 主引导程序
 - 一段存储在主引导区（MBR )中的有效代码
 - 并不固化于硬件，<font color=red>属于操作系统代码的一部分</font>
 - <font color=red>启动操作系统内核的桥梁</font>，由汇编程序写成
 - 代码总量不能超过 <font color=red>512</font> 个字节（<font color=red>包含 0x55aa</font> )
 
-## 1.3. 主引导程序的开发
+## 1.2. 主引导程序的开发
 ![](vx_images/002_1.png)
 
-## 1.4. 课程实验
+# 2. 第一个主引导程序的编写
+## 2.1. 实验内容
 - 编写一个主引导程序 (汇编语言）
 - 可独立运行于 x86 架构的主机（无操作系统）
 - 运行后在屏幕上打印"Hello, DTOS!"
 
-## 1.5. 实现思路
-1. 将关键寄存器的值设置为0 `( mov ax, 0 )`
-2. 定义需要打印的数据 `( db "Hello,D.T.OS!" )`
-3. 打印预定义好的字符数据 `( int 0x10 )`
+## 2.2. 实现思路
+- 将关键寄存器的值设置为0：`mov ax, 0`
+- 定义需要打印的数据：`db "Hello,D.T.OS!"`
+- 打印预定义好的字符数据： `int 0x10`
 
-## 1.6. 汇编小贴士一
+## 2.3. 汇编小贴士一
 - mov : 赋值操作，将右操作数赋值给左操作数
     ```x86asm
     mov ax, 0 ;将0赋值绐ax寄存器
@@ -38,7 +38,7 @@
     hlt ;使程序进入睡眠状态
     ```
 
-## 1.7. 汇编小贴士二
+## 2.4. 汇编小贴士二
 - 汇编中地址的访问方式：段地址：段内偏移地址
     ```x86asm
     mov byte [0xb800:0x01], 0x07 ; 0xb800:0x01 -> 0xb8000 + 0x01
@@ -48,35 +48,34 @@
 -  `$` vs `$$`
     - `$` 表示当前指令行地址，`$$` 表示当前汇编段起始地址 (程序的起始地址, 比如主引导程序就是最开始的0x7c00)
 
-## 1.8. 中断调用 vs 函数调用
+## 2.5. 中断调用 vs 函数调用
 - 在屏幕上打印一个字符
 ![](vx_images/002_2.png)
 
-# 2. 编程实验 第一个引导加载程序
+## 2.6. 编程实验 第一个引导加载程序
 代码编写：[<u>boot.asm</u>](vx_attachments/002/boot.asm)
 
-# 3. 问题
-## 3.1. 如何验证编写的主引导程序？
+# 3. 第一个主引导程序的验证
+## 3.1. 实验环境
+- VMware15.0.4
+- Ubuntu 10.10 ( 查看Ubuntu版本 : lsb_release -a )
 
 ## 3.2. 解决方案设计
 - 将汇编源码编译为二进制机器码 ( <font color=red>nasm</font> )
-- 创建虚拟盘 ( <font color=red>bximage</font> )
+- 创建虚拟软盘 ( <font color=red>bximage</font> )
 - 将二进制代码写入虚拟盘起始位置 ( <font color=red>dd</font> )
 - 在虚拟机中将虚拟盘作为启动盘执行 ( <font color=red>vmware</font> )
 
-## 3.3. 实验原材料
-- nasm (用这个编译器编译我们的汇编代码) (sudo apt-get install nasm)
-    - `nasm boot.asm -o boot.bin`
-- bximage (用这个命令创建虚拟软盘, -fd:我们要创建的时虚拟软盘, 大小为1.44M, -q:不需要任何交互, 一次性的创建出a.img) (sudo apt-get install bximage)
-    - `bximage a.img -q -fd -size=1.44`
-- dd (用这个命令将二进制的机器码,写入虚拟软盘, if:输入, of:输出到a.img这个虚拟软盘, bs:写入时每个单元大小512b, count:写入的单元个数, conv=notrunc:连续地写入,不要有任何间隔)
-    - `dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc`
+## 3.3. 实验原材料（制作 a.img）
+- 步骤
+    - nasm (用这个编译器编译我们的汇编代码) (sudo apt-get install nasm)
+        - `nasm boot.asm -o boot.bin`
+    - bximage (用这个命令创建虚拟软盘, -fd:我们要创建的时虚拟软盘, 大小为1.44M, -q:不需要任何交互, 一次性的创建出a.img) (sudo apt-get install bximage)
+        - `bximage a.img -q -fd -size=1.44`
+    - dd (用这个命令将二进制的机器码,写入虚拟软盘, if:输入, of:输出到a.img这个虚拟软盘, bs:写入时每个单元大小512b, count:写入的单元个数, conv=notrunc:连续地写入,不要有任何间隔)
+        - `dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc`
 
-# 4. [<u>编程实验 运行引导加载程序</u>](vx_attachments/code/002_Hello_DTOS)
-## 4.1. 实验环境 :
-1. VMware15.0.4
-2. Ubuntu 10.10 ( 查看Ubuntu版本 : lsb_release -a )
-## 4.2. 生成实验原材料
+- 生成实验原材料
 
 ```
 $ ls
@@ -109,7 +108,7 @@ $ dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
 512字节(512 B)已复制，0.000342366 秒，1.5 MB/秒
 ```
 
-## 4.3. 操作系统环境搭建
+## 3.4. 环境搭建与验证
 - 创建虚拟机
     1. 打开VMware Workstation, 创建新的虚拟机
     2. 自定义 -> 下一步
@@ -137,7 +136,7 @@ $ dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
     3. 开启此虚拟机, 成功打印
     ![](vx_images/002_e3.png)
 
-# 5. 小结
+# 4. 小结
 - 主引导程序的代码量不能超过 <font color=red>512</font> 字节
 - 主引导程序需要使用 <font color=red>汇编语言</font> 开发
 - 主引导程序中可以<font color=red>通过BIOS中断使用硬件功能</font>
