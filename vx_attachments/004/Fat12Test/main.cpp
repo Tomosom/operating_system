@@ -4,6 +4,7 @@
 
 using namespace std;
 
+/* 此区域内存分配1字节对齐 */
 #pragma pack(push)
 #pragma pack(1)
 struct Fat12Header
@@ -39,10 +40,6 @@ struct end
 
 #pragma pack(pop)
 
-
-// 注: get()用来操作字符和字符串的, 应该替换为read()
-// http://www.cplusplus.com/reference/istream/istream/get/
-// http://www.cplusplus.com/reference/istream/istream/read/
 void PrintHeader(Fat12Header& rf, string p)
 {
     ifstream file(p.c_str());
@@ -53,10 +50,10 @@ void PrintHeader(Fat12Header& rf, string p)
         return;
     }
 
-	/*
+    /*
      * 偏移3个字节: 因为与文件系统相关的信息就是从第0扇区偏移3个字节的地方开始的.
      * 遵循fat12的数据组织方式, 遵循规定, (参考004 fat12主引导区表 前面3个是跳转指令)
-	 */
+     */
     file.seekg(3);
 
     //file.get(reinterpret_cast<char*>(&rf), sizeof(rf) + 1); // error
@@ -88,12 +85,16 @@ void PrintHeader(Fat12Header& rf, string p)
 
     file.seekg(510);
 
-    /* 方法1 : 不推荐 */
+    /*
+     * 注: get()用来操作字符和字符串的, 应该替换为read()
+     * http://www.cplusplus.com/reference/istream/istream/get/
+     * http://www.cplusplus.com/reference/istream/istream/read/
+     */
 #if 0
+    /* 方法1 : 不推荐 */
     char b510, b511;
     file.get(b510);
     file.get(b511);
-
     cout << "Byte 510: " << hex << (static_cast<short>(b510) & 0xff) << endl;
     cout << "Byte 510: " << hex << (static_cast<short>(b511) & 0xff) << endl;
 #endif
@@ -102,16 +103,13 @@ void PrintHeader(Fat12Header& rf, string p)
     char b510, b511;
     file.read(&b510, sizeof(b510));
     file.read(&b511, sizeof(b511));
-
     cout << "Byte 510: " << hex << (static_cast<short>(b510) & 0xff) << endl;
     cout << "Byte 510: " << hex << (static_cast<short>(b511) & 0xff) << endl;
 
-    /* error */
 #if 0
+    /* 方法3 : error */
     struct end e;
-
     file.get(reinterpret_cast<char*>(&e), sizeof(e) + 1);
-
     cout << "Byte 510: " << hex << (static_cast<short>(e.b510) & 0xff) << endl;
     cout << "Byte 511: " << hex << (static_cast<short>(e.b511) & 0xff) << endl;
 #endif
@@ -121,8 +119,6 @@ void PrintHeader(Fat12Header& rf, string p)
 int main(int argc, char *argv[])
 {
     Fat12Header f12;
-
     PrintHeader(f12, "data.img");
-    
     return 0;
 }
